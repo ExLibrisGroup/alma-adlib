@@ -1,0 +1,15 @@
+{
+  "Main": {
+		"Intro": "Select the PO lines that you wish to send to Adlib. You can page through the records in Alma and your selection will be remembered.",
+		"Update": "Update {count, plural, =0 {} other {{count}}} {count, plural, =1{PO Line} other{PO Lines}}",
+    "NoRecords": "This app allows you to create/update records in Adlib. Please navigate to a list of PO lines.",
+    "Clear": "Reset"
+  },
+  "Form": {
+    "Title": "Update Adlib"
+  },
+	"CheckAll": "Check/Uncheck All",
+	"Cancel": "Cancel",
+	"SelectOne": "Select one",
+	"OK": "OK"
+}

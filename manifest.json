@@ -1,0 +1,14 @@
+{
+   "id": "adlib-connector",
+   "title": "Adlib Connector",
+   "description": "Connects Alma and Adlib",
+   "author": "Ex Libris",
+   "icon": {
+      "type": "url",
+      "value": "/assets/adlib-icon.png"
+   },
+   "entities": [
+      "PO_LINE",
+      "INVOICE"
+   ]
+}

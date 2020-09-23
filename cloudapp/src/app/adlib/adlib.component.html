@@ -1,0 +1,37 @@
+<div class="loading-shade" *ngIf="loading">
+  <mat-progress-spinner 
+    [mode]="percentage >= 0 ? 'determinate' : 'indeterminate'"
+    [value]="percentage"
+    diameter="50"
+    >
+  </mat-progress-spinner>
+</div>
+<div>
+  <div class="cloudapp-actions">
+    <button mat-flat-button color="secondary" [routerLink]="['']">{{'Cancel' | translate}}</button>
+    <button mat-flat-button color="primary" (click)="update()">{{'Main.Update' | translate:{count: this.ids.length} }}</button>
+  </div>
+  <h1 translate>Form.Title</h1>
+  <p>{{'Form.Intro' | translate}}</p>
+  <pre *ngIf="data">{{data | json}}</pre>
+  <div *ngIf="form">
+
+  </div>
+</div>
+<div *ngIf="results" class="results">
+  <div>
+    <p *ngIf="results.successCount>0" translate [translateParams]="{num: results.successCount}">Form.Results.Success</p>
+    <p *ngIf="results.failureCount>0" translate [translateParams]="{num: results.failureCount}" style="color: red">Form.Results.Failure</p>
+  </div>
+  <button mat-flat-button routerLink="/" color="accent">{{'OK' | translate}}</button>
+  <mat-expansion-panel >
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{'Form.Results.Details' | translate}}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <ul>
+      <li *ngFor="let result of results.details">{{result.msg}}</li>
+    </ul>
+  </mat-expansion-panel>
+</div>
