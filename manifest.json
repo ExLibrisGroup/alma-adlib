@@ -1,7 +1,8 @@
 {
-   "id": "adlib-connector",
+   "id": "exlibrisgroup/adlib-connector",
    "title": "Adlib Connector",
-   "description": "Connects Alma and Adlib",
+   "description": "Currently available for early access testing. Supports the creation of Adlib accession and linked catalog records based on the data stored in PO lines and bibliographic records.",
+   "subtitle": "Creates records in Axiell Adlib",
    "author": "Ex Libris",
    "icon": {
       "type": "url",
@@ -10,5 +11,14 @@
    "entities": [
       "PO_LINE",
       "INVOICE"
-   ]
+   ],
+   "contentSecurity": {
+      "connectSrc": [
+         "https://api-ap.exldevnetwork.net"
+      ]
+   },
+   "pages": {
+      "config": "/#/configuration",
+      "settings": "/#/configuration"
+   }
 }

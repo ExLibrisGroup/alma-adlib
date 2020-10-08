@@ -1,8 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { Entity, CloudAppEventsService, EntityType } from '@exlibris/exl-cloudapp-angular-lib';
-import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { Observable, Subscription } from 'rxjs';
+import { CanActivate, Router } from '@angular/router';
 import { SelectEntitiesComponent } from '../select-entities/select-entities.component';
+import { ConfigService } from '../services/config.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main',
@@ -46,5 +48,25 @@ export class MainComponent implements OnInit {
   clear() {
     this.ids.clear();
     this.selectEntities.clear();
+  }
+}
+
+
+@Injectable({
+  providedIn: 'root',
+})
+export class MainGuard implements CanActivate {
+  constructor(
+    private configService: ConfigService,
+    private router: Router
+  ) {}
+  canActivate(): Observable<boolean> {
+    return this.configService.get().pipe( map( config => {
+      if (!config.adlibBaseUrl) {
+        this.router.navigate(['/errors/noconfig']);
+        return false;
+      }
+      return true;
+    }))
   }
 }

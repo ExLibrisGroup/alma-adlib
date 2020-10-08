@@ -9,13 +9,22 @@
 <div>
   <div class="cloudapp-actions">
     <button mat-flat-button color="secondary" [routerLink]="['']">{{'Cancel' | translate}}</button>
-    <button mat-flat-button color="primary" (click)="update()">{{'Main.Update' | translate:{count: this.ids.length} }}</button>
+    <button mat-flat-button color="primary" (click)="update()" [disabled]="loading || results">{{'Form.Update' | translate:{count: this.ids.length} }}</button>
   </div>
   <h1 translate>Form.Title</h1>
-  <p>{{'Form.Intro' | translate}}</p>
-  <pre *ngIf="data">{{data | json}}</pre>
-  <div *ngIf="form">
-
+  <div *ngIf="data">
+    <p>{{'Form.Intro' | translate:{count: this.ids.length} }}</p>
+    <ul>
+      <li *ngFor="let record of data">{{record.title}}</li>
+    </ul>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{'Form.Results.Details' | translate}}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <pre>{{data | json}}</pre>
+    </mat-expansion-panel>
   </div>
 </div>
 <div *ngIf="results" class="results">

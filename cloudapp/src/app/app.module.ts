@@ -6,7 +6,7 @@ import { MaterialModule, LazyTranslateLoader } from '@exlibris/exl-cloudapp-angu
 import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader, TranslateParser } from '@ngx-translate/core';
 import { TranslateICUParser } from 'ngx-translate-parser-plural-select';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -14,6 +14,10 @@ import { MainComponent } from './main/main.component';
 import { SelectEntitiesComponent } from './select-entities/select-entities.component';
 import { AdlibComponent } from './adlib/adlib.component';
 import { AlmaService } from './services/alma.service';
+import { AdlibService } from './services/adlib.service';
+import { ConfigurationComponent } from './configuration/configuration.component';
+import { ConfigService } from './services/config.service';
+import { NoConfigErrorComponent } from './static/errors.component';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -36,11 +40,13 @@ export function getTranslateModuleWithICU() {
 }
 
 @NgModule({
-  declarations: [		
+  declarations: [			
     AppComponent,
     MainComponent,
     SelectEntitiesComponent,
-      AdlibComponent
+    AdlibComponent,
+    ConfigurationComponent,
+    NoConfigErrorComponent,
    ],
   imports: [
     MaterialModule,
@@ -49,11 +55,14 @@ export function getTranslateModuleWithICU() {
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     getTranslateModuleWithICU(),
     getToastrModule(),
   ],
   providers: [
-    AlmaService
+    AlmaService,
+    AdlibService,
+    ConfigService,
   ],
   bootstrap: [AppComponent]
 })
