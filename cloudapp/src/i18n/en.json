@@ -9,7 +9,7 @@
     "Title": "Update Adlib",
     "Intro": "The following {count, plural, =1{record is} other{records are}} ready to be created. Click the button above to send the data to Adlib.",
     "Update": "Create {count, plural, =0 {} other {{count}}} {count, plural, =1{record} other{records}}",
-    "FailureMessage": "Accession record could not be created: {message}",
+    "FailureMessage": "Accession record could not be created for MMS ID {mmsId}",
     "SuccessMessage": "Accession record #{priref} was successfully created for MMS ID {mmsId}.",
     "Results": {
 			"Details": "Details",
@@ -24,10 +24,13 @@
     "AdlibUrl": "Adlib Service Base URL",
     "AdlibDatabase": "Adlib Database Name",
     "Username": "Username",
-    "Password": "Password"
+    "Password": "Password",
+    "Authentication": "Authentication Details",
+    "AuthenticationSubtitle": "To overwrite credentials, enter the service username and password."
   },
   "Errors": {
-    "NoConfig": "This application must be configured by an administrator."
+    "NoConfig": "This application must be configured by an administrator.",
+    "ConfigLink": "Click here to configure the app."
   },
 	"CheckAll": "Check/Uncheck All",
 	"Cancel": "Cancel",

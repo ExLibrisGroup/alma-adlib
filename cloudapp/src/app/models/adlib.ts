@@ -19,6 +19,7 @@ export interface AdlibResponse {
 
 export interface AdlibError {
   error: any;
+  data?: AdlibData;
 }
 
 export const isAdlibError = (obj: any): obj is AdlibError => obj.error !== undefined;

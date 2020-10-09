@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CloudAppSettingsService } from "@exlibris/exl-cloudapp-angular-lib";
+import { CloudAppConfigService } from "@exlibris/exl-cloudapp-angular-lib";
 import { Observable, of } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { Config } from "../models/config";
@@ -11,7 +11,7 @@ export class ConfigService {
   _config: Config;
 
   constructor( 
-    private configService: CloudAppSettingsService
+    private configService: CloudAppConfigService
   ) {  }
 
   get(): Observable<Config> {

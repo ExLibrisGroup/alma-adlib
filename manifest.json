@@ -18,7 +18,6 @@
       ]
    },
    "pages": {
-      "config": "/#/configuration",
-      "settings": "/#/configuration"
+      "config": "/#/configuration"
    }
 }

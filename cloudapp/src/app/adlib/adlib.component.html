@@ -33,14 +33,17 @@
     <p *ngIf="results.failureCount>0" translate [translateParams]="{num: results.failureCount}" style="color: red">Form.Results.Failure</p>
   </div>
   <button mat-flat-button routerLink="/" color="accent">{{'OK' | translate}}</button>
-  <mat-expansion-panel >
+  <mat-expansion-panel [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{'Form.Results.Details' | translate}}
       </mat-panel-title>
     </mat-expansion-panel-header>
     <ul>
-      <li *ngFor="let result of results.details">{{result.msg}}</li>
+      <li *ngFor="let result of results.details">
+        <span *ngIf="isAdlibError(result); else success">{{ 'Form.FailureMessage' | translate:{mmsId: result.data?.mmsId} }}: {{result.error.error || result.error.message }}</span>
+        <ng-template #success><span>{{ 'Form.SuccessMessage' | translate:{mmsId: result.mmsId, priref: result.priref} }}</span></ng-template>
+      </li>
     </ul>
   </mat-expansion-panel>
 </div>

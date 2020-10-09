@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { AdlibData, isAdlibError } from '../models/adlib';
@@ -17,13 +16,13 @@ export class AdlibComponent implements OnInit {
   ids: string[];
   loading = false;
   data: AdlibData[];
-  results: any;
+  isAdlibError = isAdlibError;
+  results: {successCount: number; failureCount: number; details: any[]};
 
   constructor(
     private route: ActivatedRoute,
     private alma: AlmaService,
     private adlib: AdlibService,
-    private translateService: TranslateService,
   ) { }
 
   ngOnInit() {
@@ -42,15 +41,10 @@ export class AdlibComponent implements OnInit {
     forkJoin(this.data.map(data=>this.adlib.insertRecord(data)))
     .subscribe({
       next: results => {
-        console.log('resp', results);
-        const details = results.map(result=>
-          isAdlibError(result)
-          ? { msg: this.translateService.instant('Form.FailureMessage', {message: result.error.error || result.error.message}), success: false } 
-          : { msg: this.translateService.instant('Form.SuccessMessage', result), success: true });
         this.results = {
-          successCount: details.filter(d=>d.success).length,
-          failureCount: details.filter(d=>!d.success).length,
-          details: details
+          successCount: results.filter(d=>!isAdlibError(d)).length,
+          failureCount: results.filter(d=>isAdlibError(d)).length,
+          details: results
         };
         this.data = null;
       },

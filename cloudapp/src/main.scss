@@ -8,4 +8,7 @@
 
 @mixin global-styles {
     /* Add global styles here */
+    li {
+        line-height: 1.3em;
+    }
 }

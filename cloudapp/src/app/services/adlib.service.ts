@@ -27,22 +27,14 @@ export class AdlibService {
         .set('command', 'insertrecord')
         .set('xmltype', 'Unstructured')
         .set('data', '')
-    }).pipe(
-      map(result=>{
-        console.log('in result', result);
-        let resp: AdlibResponse = {
-          mmsId: data.mmsId,
-          priref: this.extractPriref(result),
-        };
-        return resp;
-      })
-    ))
+      }).pipe(
+        map(result=> ({ mmsId: data.mmsId, priref: this.extractPriref(result) } as AdlibResponse))
+      ), data);
   }
 
   extractPriref(record: string) {
     const doc = new DOMParser().parseFromString(record, "application/xml");
     const priref = select(doc, `/adlibXML/recordList/record/@priref`, { single: true }).singleNodeValue;
-    console.log('priref', priref);
     return priref && priref.textContent;
   }
 
@@ -114,6 +106,6 @@ export class AdlibService {
   }
 }
 
-const wrapError = (obs: Observable<any>): Observable<any> => {
-  return obs.pipe(catchError(e=>of({error: e})))
+const wrapError = (obs: Observable<any>, data?: AdlibData): Observable<any> => {
+  return obs.pipe(catchError(e=>of({error: e, data})))
 }
