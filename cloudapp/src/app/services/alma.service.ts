@@ -1,15 +1,17 @@
 import { Injectable } from "@angular/core";
 import { CloudAppRestService } from "@exlibris/exl-cloudapp-angular-lib";
 import { AdlibData } from "../models/adlib";
-import { map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { iif, Observable, of } from "rxjs";
 import { select } from "../utilities";
+import { ConfigService } from "./config.service";
 
 @Injectable()
 export class AlmaService {
 
   constructor(
-    private restService: CloudAppRestService
+    private restService: CloudAppRestService,
+    private configService: ConfigService,
   ) {}
 
   getDataByPOLine(num: string): Observable<AdlibData> {
@@ -27,31 +29,52 @@ export class AlmaService {
         this.getInvoice(poline.invoiceId),
         of(null)
       )),
-      map(invoice=>Object.assign({}, invoice, bib, poline) as AdlibData)
+      map(invoice=>{
+        /* If invoice exists, populate price; otherwise leave valuation */
+        let price = {};
+        if (invoice != null) {
+          price['valuation'] = null;
+          price['price'] = poline.valuation;
+        }
+        return Object.assign({}, bib, poline, invoice, price) as AdlibData
+      })
     )
   }
 
   getPOLine(num: string): Observable<any> {
-    return this.restService.call(`/acq/po-lines/${num}`).pipe(
-      map(poline=>({
-        price: poline.price.sum,
-        currency: poline.price.currency.value,
-        vendor: poline.vendor.value,
-        note: poline.note[0] && poline.note[0].note_text,
-        invoiceId: poline.invoice_reference,
-        mmsId: (poline.resource_metadata && poline.resource_metadata.mms_id) 
-          ? poline.resource_metadata.mms_id.value
-          : null
-      }))
-    )
+    return this.configService.get().pipe(
+    switchMap(config=>{
+      const mltest = config.mitchellRegex ? new RegExp(config.mitchellRegex) : null; 
+      return this.restService.call(`/acq/po-lines/${num}`).pipe(
+        map(poline=>({
+          valuation: poline.price.sum,
+          currency: poline.price.currency.value,
+          vendor: poline.vendor.desc,
+          mitchellNumber: mltest 
+            ? (Array.isArray(poline.note) && poline.note.some(n=>mltest.test(n.note_text)) && poline.note.find(n=>mltest.test(n.note_text)).note_text) || ''
+            : null,
+          invoiceId: poline.invoice_reference,
+          accessionDate: poline.created_date,
+          mmsId: (poline.resource_metadata && poline.resource_metadata.mms_id) 
+            ? poline.resource_metadata.mms_id.value
+            : null
+        }))
+      )
+    }))
   }
 
-  getInvoice(id: string): Observable<any> {
-    return this.restService.call(`/acq/invoices/${id}`).pipe(
-      map(invoice=>({
-        approvalDate: null, // Invoice approval date
-        closureDate: null // Invoice closure date
-      }))
+  
+
+  getInvoice(number: string): Observable<any> {
+    return this.restService.call(`/acq/invoices?q=all~${number}`).pipe(
+      switchMap(invoices=>iif(()=>Array.isArray(invoices.invoice) && invoices.invoice.length>0,
+        this.restService.call(invoices.invoice[0].link),
+        of(null))),
+      catchError(()=>of(null)),
+      map(invoice => invoice 
+        ? { accessionDate: invoice.invoice_date } 
+        : { }
+      )
     )
   }
 
@@ -63,7 +86,7 @@ export class AlmaService {
         return {
           mmsId: bib.mms_id,
           title: bib.title,
-          physicalExtent: physicalExtent && physicalExtent.singleNodeValue.textContent
+          physicalExtent: physicalExtent && physicalExtent.singleNodeValue && physicalExtent.singleNodeValue.textContent
         }
       })
     )

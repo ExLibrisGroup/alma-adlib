@@ -1,15 +1,43 @@
 {
   "Main": {
 		"Intro": "Select the PO lines that you wish to send to Adlib. You can page through the records in Alma and your selection will be remembered.",
-		"Update": "Update {count, plural, =0 {} other {{count}}} {count, plural, =1{PO Line} other{PO Lines}}",
+		"Update": "Process {count, plural, =0 {} other {{count}}} {count, plural, =1{record} other{records}}",
     "NoRecords": "This app allows you to create/update records in Adlib. Please navigate to a list of PO lines.",
     "Clear": "Reset"
   },
   "Form": {
-    "Title": "Update Adlib"
+    "Title": "Update Adlib",
+    "Intro": "The following {count, plural, =1{record is} other{records are}} ready to be created. Click the button above to send the data to Adlib.",
+    "Update": "Create {count, plural, =0 {} other {{count}}} {count, plural, =1{record} other{records}}",
+    "FailureMessage": "Accession record could not be created for MMS ID {mmsId}",
+    "SuccessMessage": "Accession record #{priref} was successfully created for MMS ID {mmsId}.",
+    "Results": {
+			"Details": "Details",
+			"Success": "{num} {num, plural, =1{accession record was} other{accession records were}} created successfully.",
+			"Failure": "{num} {num, plural, =1{accession record} other{accession records}} could not be created."
+		}
+  },
+  "Configuration": {
+    "Success": "Configuration successfully saved.",
+    "Title": "Configuration",
+    "Server": "Server",
+    "Mapping": "Mapping",
+    "AdlibUrl": "Adlib Service Base URL",
+    "AdlibDatabase": "Adlib Database Name",
+    "Username": "Username",
+    "Password": "Password",
+    "MitchellRegex": "Regex to select Mitchell Number from Notes",
+    "Authentication": "Authentication Details",
+    "AuthenticationSubtitle": "To overwrite credentials, enter the service username and password."
+  },
+  "Errors": {
+    "NoConfig": "This application must be configured by an administrator.",
+    "ConfigLink": "Click here to configure the app."
   },
 	"CheckAll": "Check/Uncheck All",
 	"Cancel": "Cancel",
 	"SelectOne": "Select one",
-	"OK": "OK"
+  "OK": "OK",
+  "Back": "Back",
+  "Save": "Save"
 }
