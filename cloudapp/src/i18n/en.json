@@ -21,10 +21,12 @@
     "Success": "Configuration successfully saved.",
     "Title": "Configuration",
     "Server": "Server",
+    "Mapping": "Mapping",
     "AdlibUrl": "Adlib Service Base URL",
     "AdlibDatabase": "Adlib Database Name",
     "Username": "Username",
     "Password": "Password",
+    "MitchellRegex": "Regex to select Mitchell Number from Notes",
     "Authentication": "Authentication Details",
     "AuthenticationSubtitle": "To overwrite credentials, enter the service username and password."
   },

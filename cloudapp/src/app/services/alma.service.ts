@@ -4,12 +4,14 @@ import { AdlibData } from "../models/adlib";
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { iif, Observable, of } from "rxjs";
 import { select } from "../utilities";
+import { ConfigService } from "./config.service";
 
 @Injectable()
 export class AlmaService {
 
   constructor(
-    private restService: CloudAppRestService
+    private restService: CloudAppRestService,
+    private configService: ConfigService,
   ) {}
 
   getDataByPOLine(num: string): Observable<AdlibData> {
@@ -40,20 +42,25 @@ export class AlmaService {
   }
 
   getPOLine(num: string): Observable<any> {
-    const mltest = /ML\d/;
-    return this.restService.call(`/acq/po-lines/${num}`).pipe(
-      map(poline=>({
-        valuation: poline.price.sum,
-        currency: poline.price.currency.value,
-        vendor: poline.vendor.desc,
-        mitchellNumber: (Array.isArray(poline.note) && poline.note.some(n=>mltest.test(n.note_text)) && poline.note.find(n=>mltest.test(n.note_text)).note_text) || '',
-        invoiceId: poline.invoice_reference,
-        accessionDate: poline.created_date,
-        mmsId: (poline.resource_metadata && poline.resource_metadata.mms_id) 
-          ? poline.resource_metadata.mms_id.value
-          : null
-      }))
-    )
+    return this.configService.get().pipe(
+    switchMap(config=>{
+      const mltest = config.mitchellRegex ? new RegExp(config.mitchellRegex) : null; 
+      return this.restService.call(`/acq/po-lines/${num}`).pipe(
+        map(poline=>({
+          valuation: poline.price.sum,
+          currency: poline.price.currency.value,
+          vendor: poline.vendor.desc,
+          mitchellNumber: mltest 
+            ? (Array.isArray(poline.note) && poline.note.some(n=>mltest.test(n.note_text)) && poline.note.find(n=>mltest.test(n.note_text)).note_text) || ''
+            : null,
+          invoiceId: poline.invoice_reference,
+          accessionDate: poline.created_date,
+          mmsId: (poline.resource_metadata && poline.resource_metadata.mms_id) 
+            ? poline.resource_metadata.mms_id.value
+            : null
+        }))
+      )
+    }))
   }
 
   

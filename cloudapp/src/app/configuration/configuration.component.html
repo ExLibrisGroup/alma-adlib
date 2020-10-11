@@ -10,8 +10,8 @@
   <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
 <form *ngIf="form" [formGroup]="form">
-  <section class="config-section">
-    <h2 translate>Configuration.Server</h2>
+  <mat-tab-group mat-align-tabs="start">
+    <mat-tab [label]="'Configuration.Server' | translate">
     <mat-form-field appearance="standard">
       <mat-label translate>Configuration.AdlibUrl</mat-label>
       <textarea matInput rows="4" formControlName="adlibBaseUrl"></textarea>
@@ -35,6 +35,13 @@
           <input matInput #adlibpass>
         </mat-form-field>  
       </mat-card-content>
-    </mat-card>         
-  </section>
+    </mat-card> 
+  </mat-tab>
+  <mat-tab [label]="'Configuration.Mapping' | translate">
+    <mat-form-field appearance="standard">
+      <mat-label translate>Configuration.MitchellRegex</mat-label>
+      <input matInput formControlName="mitchellRegex">
+    </mat-form-field>    
+  </mat-tab>
+  </mat-tab-group> 
 </form>
