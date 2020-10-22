@@ -3,7 +3,7 @@ import { CloudAppRestService } from "@exlibris/exl-cloudapp-angular-lib";
 import { AdlibData } from "../models/adlib";
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { iif, Observable, of } from "rxjs";
-import { select } from "../utilities";
+import { nodesToArray, select, dateString } from "../utilities";
 import { ConfigService } from "./config.service";
 
 @Injectable()
@@ -24,11 +24,7 @@ export class AlmaService {
         of(null)
       )),
       tap(resp => bib = resp),
-      switchMap(() => iif(
-        () => !!(poline.invoiceId),
-        this.getInvoice(poline.invoiceId),
-        of(null)
-      )),
+      switchMap(() => this.getInvoice(num)),
       map(invoice=>{
         /* If invoice exists, populate price; otherwise leave valuation */
         let price = {};
@@ -53,8 +49,7 @@ export class AlmaService {
           mitchellNumber: mltest 
             ? (Array.isArray(poline.note) && poline.note.some(n=>mltest.test(n.note_text)) && poline.note.find(n=>mltest.test(n.note_text)).note_text) || ''
             : null,
-          invoiceId: poline.invoice_reference,
-          accessionDate: poline.created_date,
+          accessionDate: dateString(poline.created_date),
           mmsId: (poline.resource_metadata && poline.resource_metadata.mms_id) 
             ? poline.resource_metadata.mms_id.value
             : null
@@ -66,14 +61,14 @@ export class AlmaService {
   
 
   getInvoice(number: string): Observable<any> {
-    return this.restService.call(`/acq/invoices?q=all~${number}`).pipe(
+    return this.restService.call(`/acq/invoices?q=pol_number~${number}`).pipe(
       switchMap(invoices=>iif(()=>Array.isArray(invoices.invoice) && invoices.invoice.length>0,
         this.restService.call(invoices.invoice[0].link),
         of(null))),
       catchError(()=>of(null)),
       map(invoice => invoice 
-        ? { accessionDate: invoice.invoice_date } 
-        : { }
+        ? { accessionDate: dateString(invoice.invoice_date), invoiceId: invoice.id } 
+        : null
       )
     )
   }
@@ -82,15 +77,15 @@ export class AlmaService {
     return this.restService.call(`/bibs/${mmsId}`).pipe(
       map(bib=>{
         const doc = new DOMParser().parseFromString(bib.anies, "application/xml");
-        const physicalExtent = select(doc, `/record/datafield[@tag='300']/subfield[@code='a']`, { single: true });
+        const physicalExtent = select(doc, `/record/datafield[@tag='300']/subfield[@code='a' or @code='b' or @code='c']`);
+        const title = select(doc, `/record/datafield[@tag='245']/subfield[@code='a' or @code='b' or @code='c']`);
+        console.log('vals', physicalExtent, title);
         return {
           mmsId: bib.mms_id,
-          title: bib.title,
-          physicalExtent: physicalExtent && physicalExtent.singleNodeValue && physicalExtent.singleNodeValue.textContent
+          title: nodesToArray(title).join(' '),
+          physicalExtent: nodesToArray(physicalExtent).join(' ')
         }
       })
     )
-
   }
-
 }

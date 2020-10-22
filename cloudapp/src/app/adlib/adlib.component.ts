@@ -38,7 +38,7 @@ export class AdlibComponent implements OnInit {
 
   update() {
     this.loading = true;
-    forkJoin(this.data.map(data=>this.adlib.insertRecord(data)))
+    forkJoin(this.data.map(data=>this.adlib.insertRecords(data)))
     .subscribe({
       next: results => {
         this.results = {

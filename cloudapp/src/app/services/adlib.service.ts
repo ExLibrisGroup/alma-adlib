@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { CloudAppEventsService, HttpMethod } from "@exlibris/exl-cloudapp-angular-lib";
 import { iif, Observable, of } from "rxjs";
 import { catchError, map, switchMap, tap } from "rxjs/operators";
-import { AdlibData, AdlibError, AdlibResponse } from "../models/adlib";
+import { AdlibData, AdlibError, AdlibResponse, isAdlibError } from "../models/adlib";
 import { select } from "../utilities";
 import { ConfigService } from "./config.service";
 
@@ -19,17 +19,50 @@ export class AdlibService {
     private configService: ConfigService,
   ) { }
 
-  insertRecord(data: AdlibData): Observable<AdlibResponse | AdlibError> {
+  insertRecords(data: AdlibData) {
+    let accessionResponse: AdlibResponse | AdlibError;
+    return this.insertAccesesionRecord(data).pipe(
+      tap(resp => accessionResponse = resp),
+      switchMap(resp => iif(
+        ()=>isAdlibError(resp),
+        of({error: 'Catalog record skipped - Accession record was not created', data: data} as AdlibError),
+        this.insertCatalogRecord(data)
+      )),
+      /* Return only accession record response, for now */
+      map(resp=>accessionResponse)
+    )
+  }
+
+  insertAccesesionRecord(data: AdlibData): Observable<AdlibResponse | AdlibError> {
     return wrapError(this.call({
       method: HttpMethod.POST,
-      body: this.buildAdlibXml(data),
+      body: this.buildAdlibAccessionXml(data),
+      db: 'accession',
       params: new HttpParams()
         .set('command', 'insertrecord')
         .set('xmltype', 'Unstructured')
         .set('data', '')
-      }).pipe(
+      })
+      .pipe(
         map(result=> ({ mmsId: data.mmsId, priref: this.extractPriref(result) } as AdlibResponse))
-      ), data);
+      ),
+    data);
+  }
+
+  insertCatalogRecord(data: AdlibData): Observable<AdlibResponse | AdlibError> {
+    return wrapError(this.call({
+      method: HttpMethod.POST,
+      body: this.buildAdlibCatalogXml(data),
+      db: 'catalog',
+      params: new HttpParams()
+        .set('command', 'insertrecord')
+        .set('xmltype', 'Unstructured')
+        .set('data', '')
+      })
+      .pipe(
+        map(result=> ({ mmsId: data.mmsId, priref: this.extractPriref(result) } as AdlibResponse))
+      ), 
+    data);
   }
 
   extractPriref(record: string) {
@@ -45,7 +78,7 @@ export class AdlibService {
     })
   }
 
-  call(options: { method?: HttpMethod, params?: HttpParams, body?: string }) {
+  call(options: { method?: HttpMethod, params?: HttpParams, body?: string, db?: 'accession' | 'catalog' }) {
     return iif(()=>this.token == undefined,
       this.eventsService.getAuthToken().pipe(tap(token=>this.token = token)),
       of(this.token)
@@ -53,7 +86,8 @@ export class AdlibService {
       switchMap(()=>this.configService.get()),
       switchMap(config=>{
         const url = new URL(config.adlibBaseUrl);
-        const reqUrl = `${PROXY_URL}${url.pathname}?database=${config.adlibDatabase}`;
+        const db = options.db == 'catalog' ? config.adlibCatalogDb : config.adlibAccessionDb;
+        const reqUrl = `${PROXY_URL}${url.pathname}?database=${db}`;
         const headers = new HttpHeaders({
           'X-Proxy-Host': url.hostname,
           'X-Proxy-Auth': config.adlibAuth,
@@ -67,7 +101,7 @@ export class AdlibService {
           case HttpMethod.PUT:
             return wrapError(this.http.put(reqUrl, options.body, opts));
           case HttpMethod.POST:
-            return this.http.post(reqUrl, options.body, opts);
+            return wrapError(this.http.post(reqUrl, options.body, opts));
           case HttpMethod.DELETE:
             return wrapError(this.http.delete(reqUrl, opts));
         }
@@ -80,16 +114,15 @@ export class AdlibService {
         } else {
           return response;
         }
-  
       })
     )
   }
 
-  buildAdlibXml(data: AdlibData) {
+  buildAdlibAccessionXml(data: AdlibData) {
     return `
     <adlibXML>
       <recordList>
-          <record priref="0">
+        <record priref="0">
           <title>${data.title}</title>
           <object_number>${data.mmsId}</object_number>
           <dimension.free>${data.physicalExtent}</dimension.free>
@@ -99,10 +132,23 @@ export class AdlibService {
           <acquisition.price.currency>${data.currency}</acquisition.price.currency>
           <acquisition.notes>${data.vendor}</acquisition.notes>
           <mitchell_number>${data.mitchellNumber}</mitchell_number>
-          </record>
+        </record>
       </recordList>
     </adlibXML>
     `;
+  }
+
+  buildAdlibCatalogXml(data: AdlibData) {
+    return `
+    <adlibXML>
+      <recordList>
+        <record priref="0">
+          <title>${data.title}</title>
+          <related_accession_number>${data.mmsId}</related_accession_number>
+        </record>
+      </recordList>
+    </adlibXML>    
+    `
   }
 }
 

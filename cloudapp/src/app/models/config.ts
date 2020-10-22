@@ -1,6 +1,7 @@
 export class Config {
   adlibBaseUrl: string = "";
-  adlibDatabase: string = "archive";
+  adlibAccessionDb: string = "archiveaccession";
+  adlibCatalogDb: string = "archivecatalogue";
   adlibAuth: string = "";
   mitchellRegex: string = "ML\\d*";
 }

@@ -51,7 +51,8 @@ const configFormGroup = (config: Config) => {
   return new FormGroup({
     adlibBaseUrl: new FormControl(config.adlibBaseUrl),
     adlibAuth: new FormControl(config.adlibAuth),
-    adlibDatabase: new FormControl(config.adlibDatabase),
+    adlibAccessionDb: new FormControl(config.adlibAccessionDb),
+    adlibCatalogDb: new FormControl(config.adlibCatalogDb),
     mitchellRegex: new FormControl(config.mitchellRegex),
   })
 }
