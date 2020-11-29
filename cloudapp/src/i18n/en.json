@@ -24,7 +24,7 @@
     "Mapping": "Mapping",
     "AdlibUrl": "Adlib Service Base URL",
     "AdlibAccessionDb": "Adlib Accession Database Name",
-    "AdlibCatalogDb": "Adlib Archive Database Name",
+    "AdlibCatalogDb": "Adlib Catalog Database Name",
     "Username": "Username",
     "Password": "Password",
     "MitchellRegex": "Regex to select Mitchell Number from Notes",

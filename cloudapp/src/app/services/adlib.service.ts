@@ -145,6 +145,8 @@ export class AdlibService {
         <record priref="0">
           <title>${data.title}</title>
           <related_accession_number>${data.mmsId}</related_accession_number>
+          <dimension.free>${data.physicalExtent}</dimension.free>
+          <acquisition.notes>${data.vendor}</acquisition.notes>
         </record>
       </recordList>
     </adlibXML>    
