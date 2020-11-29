@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastrService } from 'ngx-toastr';
+import { AlertService } from '@exlibris/exl-cloudapp-angular-lib';
 import { Config } from '../models/config';
 import { ConfigService } from '../services/config.service';
 
@@ -18,7 +18,7 @@ export class ConfigurationComponent implements OnInit {
 
   constructor(
     private configService: ConfigService,
-    private toastr: ToastrService,
+    private alert: AlertService,
     private translate: TranslateService,
   ) { }
 
@@ -38,10 +38,10 @@ export class ConfigurationComponent implements OnInit {
     if (username && password) val.adlibAuth = btoa(`${username}:${password}`);
     this.configService.set(val).subscribe(
       () => {
-        this.toastr.success(this.translate.instant('Configuration.Success'));
+        this.alert.success(this.translate.instant('Configuration.Success'));
         this.form.markAsPristine();
       },
-      err => this.toastr.error(err.message),
+      err => this.alert.error(err.message),
       ()  => this.saving = false
     );
   }  
