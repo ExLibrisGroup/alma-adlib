@@ -24,4 +24,14 @@ const dateString = str => {
   }
 }
 
-export { select, nodesToArray, dateString }
+const escapeXml = (str: string) => {
+  return str.replace(/[<>&]/g, function (c) {
+      switch (c) {
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '&': return '&amp;';
+      }
+  });
+}
+
+export { select, nodesToArray, dateString, escapeXml }

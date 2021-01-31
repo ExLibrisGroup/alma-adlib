@@ -4,7 +4,7 @@ import { CloudAppEventsService, HttpMethod } from "@exlibris/exl-cloudapp-angula
 import { iif, Observable, of } from "rxjs";
 import { catchError, map, switchMap, tap } from "rxjs/operators";
 import { AdlibData, AdlibError, AdlibResponse, isAdlibError } from "../models/adlib";
-import { select } from "../utilities";
+import { select, escapeXml } from "../utilities";
 import { ConfigService } from "./config.service";
 
 const PROXY_URL = 'https://api-ap.exldevnetwork.net/proxy';
@@ -123,15 +123,15 @@ export class AdlibService {
     <adlibXML>
       <recordList>
         <record priref="0">
-          <title>${data.title}</title>
+          <title>${escapeXml(data.title)}</title>
           <object_number>${data.mmsId}</object_number>
-          <dimension.free>${data.physicalExtent}</dimension.free>
+          <dimension.free>${escapeXml(data.physicalExtent)}</dimension.free>
           <accession_date>${data.accessionDate}</accession_date>
           <acquisition.price.value>${data.price}</acquisition.price.value>
           <valuation_AUD>${data.valuation}</valuation_AUD>
           <acquisition.price.currency>${data.currency}</acquisition.price.currency>
-          <acquisition.notes>${data.vendor}</acquisition.notes>
-          <mitchell_number>${data.mitchellNumber}</mitchell_number>
+          <acquisition.notes>${escapeXml(data.vendor)}</acquisition.notes>
+          <mitchell_number>${escapeXml(data.mitchellNumber)}</mitchell_number>
         </record>
       </recordList>
     </adlibXML>
@@ -143,10 +143,10 @@ export class AdlibService {
     <adlibXML>
       <recordList>
         <record priref="0">
-          <title>${data.title}</title>
+          <title>${escapeXml(data.title)}</title>
           <related_accession_number>${data.mmsId}</related_accession_number>
-          <dimension.free>${data.physicalExtent}</dimension.free>
-          <acquisition.notes>${data.vendor}</acquisition.notes>
+          <dimension.free>${escapeXml(data.physicalExtent)}</dimension.free>
+          <acquisition.notes>${escapeXml(data.vendor)}</acquisition.notes>
         </record>
       </recordList>
     </adlibXML>    
