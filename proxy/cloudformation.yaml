@@ -16,22 +16,6 @@
       Description: Allow calls from development environments; true/false
       Default: ''      
   Resources:
-    ProxyAPI:
-      Type: AWS::Serverless::HttpApi
-      Properties:
-        DefinitionBody: 
-          openapi: "3.0.1"
-          info:
-            title: "CloudAppProxy"          
-          paths:
-            /{proxy+}:
-              x-amazon-apigateway-any-method:
-               x-amazon-apigateway-integration:
-                 payloadFormatVersion: "2.0"
-                 type: "aws_proxy"
-                 httpMethod: "POST"
-                 uri:
-                   Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CloudAppProxy.Arn}/invocations"
     Dependencies:
       Type: "AWS::Serverless::LayerVersion"
       Properties:
@@ -41,43 +25,6 @@
           - nodejs10.x
           - nodejs12.x
         LicenseInfo: 'Apache-2.0'
-    LambdaExecutionRole:
-      Type: AWS::IAM::Role
-      Properties:
-        AssumeRolePolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-        Path: "/"
-        Policies:
-        - PolicyName: logs
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-            - Effect: Allow
-              Action:
-              - logs:CreateLogGroup
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-              Resource: arn:aws:logs:*:*:*
-    LambdaApiGatewayExecutionPermission:
-      Type: AWS::Lambda::Permission
-      Properties:
-        Action: lambda:InvokeFunction
-        FunctionName: !GetAtt CloudAppProxy.Arn
-        Principal: apigateway.amazonaws.com
-        SourceArn: !Join
-          - ''
-          - - 'arn:aws:execute-api:'
-            - !Ref AWS::Region
-            - ":"
-            - !Ref AWS::AccountId
-            - ":"
-            - !Ref ProxyAPI
-            - "/*/*"
     CloudAppProxy:
       Type: AWS::Serverless::Function
       Properties:
@@ -86,7 +33,9 @@
         Layers:
           - !Ref Dependencies
         Handler: handler.handler
-        Role: !GetAtt LambdaExecutionRole.Arn
+        Events:
+          ProxyApi:
+            Type: HttpApi
         Runtime: nodejs12.x
         Timeout: 60
         Environment:
@@ -97,11 +46,6 @@
   Outputs:
     ApiUrl:
       Description: URL of the API proxy
-      Value: !Join
-        - ''
-        - - https://
-          - !Ref ProxyAPI
-          - ".execute-api."
-          - !Ref AWS::Region
-          - ".amazonaws.com/"
+      Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+
   

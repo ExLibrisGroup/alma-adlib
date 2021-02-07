@@ -79,7 +79,6 @@ export class AlmaService {
         const doc = new DOMParser().parseFromString(bib.anies, "application/xml");
         const physicalExtent = select(doc, `/record/datafield[@tag='300']/subfield[@code='a' or @code='b' or @code='c']`);
         const title = select(doc, `/record/datafield[@tag='245']/subfield[@code='a' or @code='b' or @code='c']`);
-        console.log('vals', physicalExtent, title);
         return {
           mmsId: bib.mms_id,
           title: nodesToArray(title).join(' '),

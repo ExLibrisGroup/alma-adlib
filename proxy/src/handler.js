@@ -3,6 +3,8 @@ const utils = require('./utils');
 const { auth } = require('./authorizer/index');
 const fetch = require('node-fetch');
 
+/* global URL */
+
 const handler = async (event, context) => {
   let result;
   if (event.requestContext && event.requestContext.http.method == 'OPTIONS') {
@@ -16,21 +18,29 @@ const handler = async (event, context) => {
     return utils.cors(result, event);
   }
 
-  const PROXY_HOST = process.env.PROXY_HOST || event.headers['x-proxy-host'];
-  const PROXY_AUTH = process.env.PROXY_AUTH || event.headers['x-proxy-auth'];
+  const proxyAuth = process.env.PROXY_AUTH || event.headers['x-proxy-auth'];
+  const rawHost = process.env.PROXY_HOST || event.headers['x-proxy-host'];
+  let hostname, port, protocol;
+  if (rawHost.startsWith('http')) {
+    ({ hostname, port, protocol } = new URL(rawHost));
+  } else {
+    hostname = rawHost;
+    protocol = 'https:'
+  }
+
   let customRequestHeader;
   try {
     if ( event.headers ) {
       customRequestHeader = event.headers;
     }
-    if (PROXY_AUTH) customRequestHeader['authorization'] = `Basic ${PROXY_AUTH}`;
-    customRequestHeader['host'] = PROXY_HOST;
+    if (proxyAuth) customRequestHeader['authorization'] = `Basic ${proxyAuth}`;
+    customRequestHeader['host'] = hostname;
     const params = {
       method: event.requestContext.http.method,
       headers: customRequestHeader,
       body: event.body
     };
-    const url = `https://${PROXY_HOST}${event.rawPath}?${event.rawQueryString}`;
+    const url = `${protocol}//${hostname}${port ? ':' + port : ''}${event.rawPath}?${event.rawQueryString}`
     const response = await fetch(url, params);
     const textResponse = await response.text();
     let responseHeaders = {};
