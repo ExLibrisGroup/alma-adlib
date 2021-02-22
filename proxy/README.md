@@ -34,7 +34,7 @@ allowed_inst_codes =  # Optional list of allowed institution codes
 ```
 $ npm run deploy
 ```
-5. The host and authentication (basic authentication string) are provided by one of two methods:
+5. The host and authentication ([basic authentication string](https://www.blitter.se/utils/basic-authentication-header-generator/)) are provided by one of two methods:
    * The following environment variables: `PROXY_HOST` and `PROXY_AUTH`
    * The following header values: `X-Proxy-Host` and `X-Proxy-Auth`
 
@@ -44,3 +44,27 @@ Don't forget to add the proxy URL to the [`contentSecurity` section of the manif
 The following optional environment variables are supported in the Lambda function. They can also be set in the `.npmrc` file as described above.
 * `CLOUDAPP_AUTHORIZER_ALLOWED_APPS`: Comma separated list of allowed Cloud App IDs (Github username/repository name, e.g. ExLibrisGroup/alma-hathitrust-availability)
 * `CLOUDAPP_AUTHORIZER_ALLOWED_INST_CODES`: Comma separated list of allowed institution codes (e.g. 01MYUNI_INST1, 01MYUNI_INST2)
+
+## Usage
+To use the proxy once it's deployed, contruct the HTTP request with the `X-Proxy-Host` and optional `X-Proxy-Auth` headers as described above and provide a valid Cloud App authorization token. 
+
+For example:
+```
+$ curl -v \
+-H 'X-Proxy-Host: apps01.ext.exlibrisgroup.com' \
+-H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImV4bGhlcC0wMSJ9...' \
+https://api-ap.exldevnetwork.net/proxy/apps.json
+
+< HTTP/2 200 
+< access-control-allow-origin: *
+< accept-ranges: bytes
+< access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+< access-control-allow-headers: authorization, content-type, x-proxy-host, x-proxy-auth
+
+[
+   {
+
+   }
+]
+```
+
