@@ -66,9 +66,12 @@ export class AlmaService {
         this.restService.call(invoices.invoice[0].link),
         of(null))),
       catchError(()=>of(null)),
-      map(invoice => invoice 
-        ? { accessionDate: dateString(invoice.invoice_date), invoiceId: invoice.id } 
-        : null
+      map(invoice => invoice ?
+        { 
+          accessionDate: dateString((invoice.payment && invoice.payment.voucher_date) || invoice.invoice_date), 
+          invoiceId: invoice.id 
+        } :
+        null
       )
     )
   }
