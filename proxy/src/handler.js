@@ -6,6 +6,7 @@ const fetch = require('node-fetch');
 /* global URL */
 
 const handler = async (event, context) => {
+  utils.fixEvent(event);
   let result;
   if (event.requestContext && event.requestContext.http.method == 'OPTIONS') {
     result = { statusCode: 204 };
@@ -33,7 +34,10 @@ const handler = async (event, context) => {
     if ( event.headers ) {
       customRequestHeader = event.headers;
     }
-    if (proxyAuth) customRequestHeader['authorization'] = `Basic ${proxyAuth}`;
+    if (proxyAuth) {
+      const authHeader = /\w+ \S*/.test(proxyAuth) ? proxyAuth : `Basic ${proxyAuth}`;
+      customRequestHeader['authorization'] = authHeader;
+    }
     customRequestHeader['host'] = hostname;
     const params = {
       method: event.requestContext.http.method,
