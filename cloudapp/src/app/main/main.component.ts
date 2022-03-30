@@ -2,7 +2,7 @@ import { Component, Injectable, OnInit, ViewChild } from '@angular/core';
 import { Entity, CloudAppEventsService, EntityType } from '@exlibris/exl-cloudapp-angular-lib';
 import { Observable, Subscription } from 'rxjs';
 import { CanActivate, Router } from '@angular/router';
-import { SelectEntitiesComponent } from '../select-entities/select-entities.component';
+import { SelectEntitiesComponent } from 'eca-components';
 import { ConfigService } from '../services/config.service';
 import { map } from 'rxjs/operators';
 
@@ -12,9 +12,8 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-  private pageLoad$: Subscription;
-  ids = new Set<string>();
-  entities: Entity[] = [];
+  selectedEntities = new Array<Entity>();
+  entityCount = 0;
   @ViewChild(SelectEntitiesComponent) selectEntities: SelectEntitiesComponent;
 
   constructor(
@@ -23,30 +22,19 @@ export class MainComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.pageLoad$ = this.eventsService.onPageLoad( pageInfo => {
-      this.entities = (pageInfo.entities)
-      .filter(e=>[EntityType.PO_LINE].includes(e.type));
-    });
   }
 
   ngOnDestroy(): void {
-    this.pageLoad$.unsubscribe();
-  }
-
-  onEntitySelected(event) {
-    if (event.checked) this.ids.add(event.id);
-    else this.ids.delete(event.id);
   }
 
   update() {
     const params = {
-      ids: Array.from(this.ids).join(','), 
+      ids: this.selectedEntities.map(e => e.id).join(','), 
     };
     this.router.navigate(['adlib', params]);
   }
 
   clear() {
-    this.ids.clear();
     this.selectEntities.clear();
   }
 }

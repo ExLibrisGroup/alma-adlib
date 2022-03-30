@@ -119,16 +119,27 @@ export class AdlibService {
   }
 
   buildAdlibAccessionXml(data: AdlibData) {
-    return `
+    let returnXML = `
     <adlibXML>
       <recordList>
         <record priref="0">
           <title>${escapeXml(data.title)}</title>
           <object_number>${data.mmsId}</object_number>
           <dimension.free>${escapeXml(data.physicalExtent)}</dimension.free>
-          <accession_date>${data.accessionDate}</accession_date>
-          <acquisition.price.value>${data.price}</acquisition.price.value>
-          <valuation_AUD>${data.valuation}</valuation_AUD>
+          <accession_date>${data.accessionDate}</accession_date>`;
+    if (data.price == undefined)
+      returnXML = returnXML + `
+          <acquisition.price.value></acquisition.price.value>`;
+    else
+      returnXML = returnXML + `
+          <acquisition.price.value>${data.price}</acquisition.price.value>`; 
+    if (data.valuation == undefined) 
+      returnXML = returnXML + `
+          <valuation_AUD></valuation_AUD>`;
+    else 
+      returnXML = returnXML + `
+          <valuation_AUD>${data.valuation}</valuation_AUD>`;
+    returnXML = returnXML + `
           <acquisition.price.currency>${data.currency}</acquisition.price.currency>
           <acquisition.notes>${escapeXml(data.vendor)}</acquisition.notes>
           <mitchell_number>${escapeXml(data.mitchellNumber)}</mitchell_number>
@@ -136,6 +147,8 @@ export class AdlibService {
       </recordList>
     </adlibXML>
     `;
+  //console.log ('buildAdlibAccessionXML return = ' + returnXML);
+  return returnXML;
   }
 
   buildAdlibCatalogXml(data: AdlibData) {

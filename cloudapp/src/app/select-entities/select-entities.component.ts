@@ -3,7 +3,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { Entity, EntityType } from '@exlibris/exl-cloudapp-angular-lib';
 
 @Component({
-  selector: 'app-select-entities',
+  selector: 'eca-select-entities',
   templateUrl: './select-entities.component.html',
   styleUrls: ['./select-entities.component.scss'],
   encapsulation: ViewEncapsulation.None /* apply to added elements */

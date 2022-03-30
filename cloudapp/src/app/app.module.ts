@@ -10,7 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './main/main.component';
-import { SelectEntitiesComponent } from './select-entities/select-entities.component';
+import { SelectEntitiesModule } from 'eca-components';
 import { AdlibComponent } from './adlib/adlib.component';
 import { AlmaService } from './services/alma.service';
 import { AdlibService } from './services/adlib.service';
@@ -18,7 +18,7 @@ import { ConfigurationComponent } from './configuration/configuration.component'
 import { ConfigService } from './services/config.service';
 import { NoConfigErrorComponent } from './static/errors.component';
 
-export function getTranslateModuleWithICU() {
+export function CloudAppTranslateModuleWithICU() {
   return TranslateModule.forRoot({
     loader: {
       provide: TranslateLoader,
@@ -35,7 +35,6 @@ export function getTranslateModuleWithICU() {
   declarations: [			
     AppComponent,
     MainComponent,
-    SelectEntitiesComponent,
     AdlibComponent,
     ConfigurationComponent,
     NoConfigErrorComponent,
@@ -48,7 +47,8 @@ export function getTranslateModuleWithICU() {
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    getTranslateModuleWithICU(),
+    SelectEntitiesModule,
+    CloudAppTranslateModuleWithICU(),
     AlertModule,
   ],
   providers: [
