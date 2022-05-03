@@ -24,7 +24,7 @@ export class AlmaService {
         of(null)
       )),
       tap(resp => bib = resp),
-      switchMap(() => this.getInvoice(num)),
+      switchMap(() => this.getInvoice(poline.number)),
       map(invoice=>{
         /* If invoice exists, populate price; otherwise leave valuation */
         let price = {};
@@ -52,7 +52,8 @@ export class AlmaService {
           accessionDate: dateString(poline.created_date),
           mmsId: (poline.resource_metadata && poline.resource_metadata.mms_id) 
             ? poline.resource_metadata.mms_id.value
-            : null
+            : null,
+          number: poline.number
         }))
       )
     }))

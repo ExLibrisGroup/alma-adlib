@@ -133,7 +133,7 @@ export class AdlibService {
     else
       returnXML = returnXML + `
           <acquisition.price.value>${data.price}</acquisition.price.value>`; 
-    if (data.valuation == undefined) 
+    if (data.valuation == undefined || data.valuation == null) 
       returnXML = returnXML + `
           <valuation_AUD></valuation_AUD>`;
     else 
